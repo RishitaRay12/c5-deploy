@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.bin
+*.onnx
+*.pt
+*.safetensors
