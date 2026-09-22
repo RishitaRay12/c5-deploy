@@ -6,7 +6,7 @@ class AgentState(TypedDict):
     messages: Annotated[list[str], operator.add]
     query: str
     user_role: Literal["employee", "customer"]  # Role segregation
-    route: Literal["rag", "sql", "hybrid"]       # Execution route
+    route: Literal["direct", "rag", "sql", "hybrid"]  # Execution route
     rag_context: str
     retrieved_sources: list[dict]
     sql_context: str

@@ -65,6 +65,7 @@ workflow.add_conditional_edges(
     }
 )
 
+workflow.add_edge("direct", "compliance_risk_validator")
 workflow.add_edge("employee_worker", "compliance_risk_validator")
 workflow.add_edge("customer_worker", "compliance_risk_validator")
 workflow.add_edge("compliance_risk_validator", "synthesizer")
