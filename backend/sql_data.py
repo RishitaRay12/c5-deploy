@@ -114,6 +114,7 @@ def init_postgres() -> None:
             cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP")
             cur.execute("ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS sources JSONB NOT NULL DEFAULT '[]'::jsonb")
             cur.execute("ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS token_usage JSONB")
+            cur.execute("ALTER TABLE chat_messages ALTER COLUMN message TYPE TEXT")
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS vendors (
                     vendor_id BIGSERIAL PRIMARY KEY,

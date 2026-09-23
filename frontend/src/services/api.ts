@@ -120,14 +120,19 @@ export const api = {
   },
 
   chat: async (payload: ChatRequest, token: string): Promise<ChatResponse> => {
-    const res = await fetch(`${API_BASE_URL}/chat`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(payload),
-    });
+    let res: Response;
+    try {
+      res = await fetch(`${API_BASE_URL}/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+    } catch {
+      throw new Error(`Cannot reach the backend at ${API_BASE_URL}. Start the API server or check CORS.`);
+    }
     if (!res.ok) {
       const body = await res.json().catch(() => null) as { detail?: string } | null;
       const error = new Error(body?.detail || `Chat request failed (${res.status})`);

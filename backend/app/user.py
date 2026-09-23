@@ -140,16 +140,27 @@ def get_chat_history(
         rows = conn.execute(
             """
             SELECT
+                id,
                 role,
                 message,
                 sources,
                 token_usage,
                 created_at
-            FROM chat_messages
-                        WHERE username = %s
-                            AND thread_id = %s
-            ORDER BY id DESC
-            LIMIT %s
+            FROM (
+                SELECT
+                    id,
+                    role,
+                    message,
+                    sources,
+                    token_usage,
+                    created_at
+                FROM chat_messages
+                WHERE username = %s
+                    AND thread_id = %s
+                ORDER BY id DESC
+                LIMIT %s
+            ) AS recent_messages
+            ORDER BY id ASC
             """,
             (
                 username,
@@ -157,9 +168,6 @@ def get_chat_history(
                 limit,
             ),
         ).fetchall()
-
-    # Reverse so oldest message comes first
-    rows = list(reversed(rows))
 
     messages = []
     for row in rows:
@@ -177,6 +185,7 @@ def get_chat_history(
             token_usage = None
 
         messages.append({
+            "id": row["id"],
             "role": row["role"],
             "message": row["message"],
             "sources": sources,

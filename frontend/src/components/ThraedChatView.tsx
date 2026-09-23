@@ -261,8 +261,36 @@ export interface TokenUsage {
   prompt_tokens?: number;
   completion_tokens?: number;
   total_tokens?: number;
+  input_tokens?: number;
+  output_tokens?: number;
+  usage?: {
+    prompt_tokens?: number;
+    completion_tokens?: number;
+    total_tokens?: number;
+    input_tokens?: number;
+    output_tokens?: number;
+  };
   [key: string]: any;
 }
+
+const getTokenCount = (tokenUsage: TokenUsage): number | null => {
+  const usage = tokenUsage.usage || tokenUsage;
+  const totalTokens = usage.total_tokens ?? tokenUsage.total_tokens;
+
+  if (typeof totalTokens === 'number') {
+    return totalTokens;
+  }
+
+  const promptTokens = usage.prompt_tokens ?? usage.input_tokens ?? tokenUsage.prompt_tokens ?? tokenUsage.input_tokens;
+  const completionTokens = usage.completion_tokens ?? usage.output_tokens ?? tokenUsage.completion_tokens ?? tokenUsage.output_tokens;
+
+  if (typeof promptTokens === 'number' || typeof completionTokens === 'number') {
+    return (typeof promptTokens === 'number' ? promptTokens : 0) +
+      (typeof completionTokens === 'number' ? completionTokens : 0);
+  }
+
+  return null;
+};
 
 export interface Message {
   id: string;
@@ -483,13 +511,10 @@ export const ThreadChatView: React.FC = () => {
                   )}
 
                   {/* Render Token Usage Metadata */}
-                  {msg.sender === 'bot' && msg.tokenUsage && (
+                  {msg.sender === 'bot' && msg.tokenUsage && getTokenCount(msg.tokenUsage) !== null && (
                     <div className="chat-meta-usage">
                       <Zap className="meta-icon-sm" />
-                      <span>
-                        Tokens: {msg.tokenUsage.total_tokens ?? 
-                          ((msg.tokenUsage.prompt_tokens || 0) + (msg.tokenUsage.completion_tokens || 0))}
-                      </span>
+                      <span>Tokens: {getTokenCount(msg.tokenUsage)}</span>
                     </div>
                   )}
                 </div>

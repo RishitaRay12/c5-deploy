@@ -44,8 +44,32 @@ export interface TokenUsage {
   prompt_tokens?: number;
   completion_tokens?: number;
   total_tokens?: number;
+  usage?: {
+    prompt_tokens?: number;
+    completion_tokens?: number;
+    total_tokens?: number;
+    input_tokens?: number;
+    output_tokens?: number;
+  };
+  input_tokens?: number;
+  output_tokens?: number;
   [key: string]: any;
 }
+
+const getTokenCount = (tokenUsage: TokenUsage): number => {
+  const usage = tokenUsage.usage || tokenUsage;
+  const totalTokens = usage.total_tokens ?? tokenUsage.total_tokens;
+
+  if (typeof totalTokens === 'number') {
+    return totalTokens;
+  }
+
+  const promptTokens = usage.prompt_tokens ?? usage.input_tokens ?? tokenUsage.prompt_tokens ?? tokenUsage.input_tokens;
+  const completionTokens = usage.completion_tokens ?? usage.output_tokens ?? tokenUsage.completion_tokens ?? tokenUsage.output_tokens;
+
+  return (typeof promptTokens === 'number' ? promptTokens : 0) +
+    (typeof completionTokens === 'number' ? completionTokens : 0);
+};
 
 
 export const ChatView: React.FC = () => {
@@ -176,7 +200,7 @@ export const ChatView: React.FC = () => {
         setError('Session expired. Please log in again.');
         setTimeout(() => navigate('/login'), 1500);
       } else {
-        setError('Failed to reach AI service.');
+        setError(errorMessage || 'The AI service returned an unexpected error.');
       }
     } finally {
       setLoading(false);
@@ -243,7 +267,7 @@ export const ChatView: React.FC = () => {
                   )}
                 </div>
                 <div className="chat-bubble-content">
-                  <p className="chat-bubble-text">
+                  <div className="chat-bubble-text">
                     <ReactMarkdown remarkPlugins={[remarkGfm]} components={{
           // Bold text styling (replaces double asterisks **)
           strong: ({ node, ...props }) => (
@@ -284,7 +308,7 @@ export const ChatView: React.FC = () => {
           td: ({ node, ...props }) => (
             <td className="px-3 py-2 border-t border-gray-800 text-gray-300" {...props} />
           )}}>{stripMarkdown(msg.text)}</ReactMarkdown>
-                  </p>
+                  </div>
                   {msg.sender === 'bot' && msg.sources && msg.sources.length > 0 && (
                     <div className="chat-sources-wrapper">
                       <button 
@@ -323,10 +347,7 @@ export const ChatView: React.FC = () => {
                     <div className="chat-meta-usage">
                       <Zap className="meta-icon-sm" />
                       <span>
-                        Tokens: {msg.tokenUsage.total_tokens ??
-                          msg.tokenUsage.usage?.total_tokens ??
-                          ((msg.tokenUsage.prompt_tokens || msg.tokenUsage.usage?.prompt_tokens || 0) +
-                           (msg.tokenUsage.completion_tokens || msg.tokenUsage.usage?.completion_tokens || 0))}
+                        Tokens: {getTokenCount(msg.tokenUsage)}
                       </span>
                     </div>
                   )}

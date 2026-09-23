@@ -1,17 +1,7 @@
 import os
 # from langchain.agents import create_agent
-# --- LlamaIndex & Vector DB Imports ---
 from langchain_ollama import ChatOllama
 from langchain_openai import ChatOpenAI
-from llama_index.core import SimpleDirectoryReader, VectorStoreIndex, StorageContext
-from llama_index.core.node_parser import SemanticSplitterNodeParser
-from llama_index.embeddings.ollama import OllamaEmbedding
-
-
-# from langchain_chroma import Chroma
-
-
-
 
 from app.config import settings
 

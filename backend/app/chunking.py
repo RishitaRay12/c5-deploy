@@ -4,10 +4,6 @@ from fastapi import UploadFile, HTTPException
 from schema import UploadResponse
 import logging
 import os
-from parse_tables import parse_pdf_tables
-from app.vector_store import add_text_chunks, get_vector_store
-
-vector_store = get_vector_store()
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +34,9 @@ async def _process_uploaded_files(files: list[UploadFile]) -> list[UploadRespons
     if not files:
         raise HTTPException(status_code=400, detail="No files were uploaded.")
 
+    from app.vector_store import add_text_chunks, get_vector_store
+
+    vector_store = get_vector_store()
     results: list[UploadResponse] = []
     supported_extensions = {".pdf", ".txt", ".md", ".csv", ".json"}
 
@@ -52,6 +51,8 @@ async def _process_uploaded_files(files: list[UploadFile]) -> list[UploadRespons
         try:
             payload = await uploaded_file.read()
             if extension == ".pdf":
+                from parse_tables import parse_pdf_tables
+
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
                     temp_file.write(payload)
                     temp_path = temp_file.name

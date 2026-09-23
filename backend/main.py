@@ -49,6 +49,11 @@ langfuse_client = get_client()
 app.include_router(user_router)  # Include user routes for registration and login
 
 
+@app.get("/health", tags=["Health"])
+def health() -> dict[str, str]:
+    return {"status": "ok"}
+
+
 @app.on_event("startup")
 def initialize_postgres() -> None:
     init_postgres()
