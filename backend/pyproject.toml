@@ -42,3 +42,7 @@ dependencies = [
 ]
 [tool.ruff.lint.flake8-bugbear]
 extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "fastapi.Path", "fastapi.Security", "fastapi.File"]
+
+[[build.env]]
+  name = "GOOGLE_ENTRYPOINT"
+  value = "uvicorn main:app --host 0.0.0.0 --port 8000"
