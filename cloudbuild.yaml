@@ -1,0 +1,33 @@
+steps:
+  # 1. Build Docker container image from ./backend directory
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/rishita12:$COMMIT_SHA'  # <-- Replace YOUR_SERVICE_NAME
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/rishita12:latest'      # <-- Replace YOUR_SERVICE_NAME
+      - './backend'                                         # <-- Path to directory with Dockerfile
+
+  # 2. Push image to Google Container Registry / Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/rishita12:$COMMIT_SHA'  # <-- Replace YOUR_SERVICE_NAME
+
+  # 3. Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'rishita12'                                 # <-- Replace YOUR_SERVICE_NAME
+      - '--image=gcr.io/$PROJECT_ID/rishita12:$COMMIT_SHA' # <-- Replace YOUR_SERVICE_NAME
+      - '--region=asia-south2'                          # <-- Replace YOUR_GCP_REGION (e.g., us-central1)
+      - '--platform=managed'
+      - '--allow-unauthenticated'                           # Omit if you want private authentication
+      - '--port=8000'                                       # Matches FastAPI port in pyproject.toml / main.py
+
+images:
+  - 'gcr.io/$PROJECT_ID/YOUR_SERVICE_NAME:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/YOUR_SERVICE_NAME:latest'
