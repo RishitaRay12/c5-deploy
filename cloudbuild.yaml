@@ -29,5 +29,5 @@ steps:
       - '--port=8000'                                       # Matches FastAPI port in pyproject.toml / main.py
 
 images:
-  - 'gcr.io/$PROJECT_ID/YOUR_SERVICE_NAME:$COMMIT_SHA'
-  - 'gcr.io/$PROJECT_ID/YOUR_SERVICE_NAME:latest'
+  - 'gcr.io/$PROJECT_ID/rishita12:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/rishita12:latest'
