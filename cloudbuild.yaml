@@ -4,9 +4,9 @@ steps:
     args:
       - 'build'
       - '-t'
-      - 'gcr.io/$PROJECT_ID/c5:$COMMIT_SHA'
+      - 'gcr.io/$PROJECT_ID/c5-deploy:$COMMIT_SHA'
       - '-t'
-      - 'gcr.io/$PROJECT_ID/c5:latest'
+      - 'gcr.io/$PROJECT_ID/c5-deploy:latest'
       - '-f'
       - './Dockerfile'
       - '.'
@@ -15,7 +15,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - 'gcr.io/$PROJECT_ID/c5:$COMMIT_SHA'
+      - 'gcr.io/$PROJECT_ID/c5-deploy:$COMMIT_SHA'
 
   # 3. Run docker-compose tests/build (Optional step using docker-compose)
   - name: 'gcr.io/cloud-builders/docker-compose'
@@ -33,7 +33,7 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'c5'
+      - 'c5-deploy'
       - '--image=gcr.io/$PROJECT_ID/c5:$COMMIT_SHA'
       - '--region=asia-south2'
       - '--platform=managed'
@@ -41,5 +41,5 @@ steps:
       - '--port=$PORT'
 
 images:
-  - 'gcr.io/$PROJECT_ID/c5:$COMMIT_SHA'
-  - 'gcr.io/$PROJECT_ID/c5:latest'
+  - 'gcr.io/$PROJECT_ID/c5-deploy:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/c5-deploy:latest'
