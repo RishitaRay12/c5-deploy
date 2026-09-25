@@ -1,33 +1,45 @@
 steps:
-  # 1. Build Docker container image from ./backend directory
+  # 1. Build Docker container image from root directory
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
       - '-t'
-      - 'gcr.io/$PROJECT_ID/$SERVICE:$COMMIT_SHA'  # <-- Replace YOUR_SERVICE_NAME
+      - 'gcr.io/$PROJECT_ID/c5:$COMMIT_SHA'
       - '-t'
-      - 'gcr.io/$PROJECT_ID/$SERVICE:latest'      # <-- Replace YOUR_SERVICE_NAME
-      - './backend'                                         # <-- Path to directory with Dockerfile
+      - 'gcr.io/$PROJECT_ID/c5:latest'
+      - '-f'
+      - './Dockerfile'
+      - '.'
 
   # 2. Push image to Google Container Registry / Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - 'gcr.io/$PROJECT_ID/$SERVICE:$COMMIT_SHA'  # <-- Replace YOUR_SERVICE_NAME
+      - 'gcr.io/$PROJECT_ID/c5:$COMMIT_SHA'
 
-  # 3. Deploy to Cloud Run
+  # 3. Run docker-compose tests/build (Optional step using docker-compose)
+  - name: 'gcr.io/cloud-builders/docker-compose'
+    args:
+      - '-f'
+      - 'docker-compose.yml'
+      - 'up'
+      - '--build'
+      - '--exit-code-from'
+      - 'c5'
+
+  # 4. Deploy to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
       - 'run'
       - 'deploy'
-      - 'rishita12'                                 # <-- Replace YOUR_SERVICE_NAME
-      - '--image=gcr.io/$PROJECT_ID/$SERVICE:$COMMIT_SHA' # <-- Replace YOUR_SERVICE_NAME
-      - '--region=asia-south2'                          # <-- Replace YOUR_GCP_REGION (e.g., us-central1)
+      - 'c5'
+      - '--image=gcr.io/$PROJECT_ID/c5:$COMMIT_SHA'
+      - '--region=asia-south2'
       - '--platform=managed'
-      - '--allow-unauthenticated'                           # Omit if you want private authentication
-      - '--port=$PORT'                                       # Matches FastAPI port in pyproject.toml / main.py
+      - '--allow-unauthenticated'
+      - '--port=$PORT'
 
 images:
-  - 'gcr.io/$PROJECT_ID/$SERVICE:$COMMIT_SHA'
-  - 'gcr.io/$PROJECT_ID/$SERVICE:latest'
+  - 'gcr.io/$PROJECT_ID/c5:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/c5:latest'
