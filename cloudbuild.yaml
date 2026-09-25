@@ -26,7 +26,7 @@ steps:
       - '--region=asia-south2'                          # <-- Replace YOUR_GCP_REGION (e.g., us-central1)
       - '--platform=managed'
       - '--allow-unauthenticated'                           # Omit if you want private authentication
-      - '--port=8000'                                       # Matches FastAPI port in pyproject.toml / main.py
+      - '--port=8080'                                       # Matches FastAPI port in pyproject.toml / main.py
 
 images:
   - 'gcr.io/$PROJECT_ID/rishita12:$COMMIT_SHA'
